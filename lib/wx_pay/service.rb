@@ -5,6 +5,20 @@ module WxPay
   module Service
     GATEWAY_URL = 'https://api.mch.weixin.qq.com'
 
+    def self.invoke_orderquery(params)
+      params = {
+        appid: WxPay.appid,
+        mch_id: WxPay.mch_id,
+        nonce_str: SecureRandom.uuid.tr('-', '')
+      }.merge(params)
+
+      r = invoke_remote("#{GATEWAY_URL}/pay/orderquery", make_payload(params))
+
+      yield r if block_given?
+
+      r
+    end
+
     INVOKE_UNIFIEDORDER_REQUIRED_FIELDS = %i(body out_trade_no total_fee spbill_create_ip notify_url trade_type)
     def self.invoke_unifiedorder(params)
       params = {
